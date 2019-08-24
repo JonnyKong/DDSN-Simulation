@@ -1,0 +1,203 @@
+diff --git a/src/face.cpp b/src/face.cpp
+index 555024f..e914690 100644
+--- a/src/face.cpp
++++ b/src/face.cpp
+@@ -62,7 +62,7 @@ Face::OversizedPacketError::OversizedPacketError(char pktType, const Name& name,
+ {
+ }
+ 
+-Face::Face(DummyIoService& ioService)
++Face::Face(boost::asio::io_service& ioService)
+   : m_impl(new Impl(*this))
+ {
+   construct(nullptr, ns3::ndn::StackHelper::getKeyChain());
+diff --git a/src/face.hpp b/src/face.hpp
+index 1909460..3d1f604 100644
+--- a/src/face.hpp
++++ b/src/face.hpp
+@@ -31,6 +31,7 @@
+ #include "net/asio-fwd.hpp"
+ #include "security/key-chain.hpp"
+ #include "security/signing-info.hpp"
++#include "boost/asio/io_service.hpp"
+ 
+ namespace ndn {
+ 
+@@ -150,7 +151,7 @@ public: // constructors
+    * @throw ConfigFile::Error the configuration file cannot be parsed or specifies an unsupported protocol
+    */
+   explicit
+-  Face(DummyIoService& ioService);
++  Face(boost::asio::io_service& ioService);
+ 
+   /**
+    * @brief Create Face using given transport (or default transport if omitted)
+@@ -428,10 +429,10 @@ public: // IO routine
+   /**
+    * @brief Return nullptr (cannot use IoService in simulations), preserved for API compatibility
+    */
+-  DummyIoService&
++  boost::asio::io_service&
+   getIoService()
+   {
+-    static DummyIoService io;
++    static boost::asio::io_service io;
+     return io;
+   }
+ 
+diff --git a/src/ims/in-memory-storage-fifo.cpp b/src/ims/in-memory-storage-fifo.cpp
+index b151ed0..df6e173 100644
+--- a/src/ims/in-memory-storage-fifo.cpp
++++ b/src/ims/in-memory-storage-fifo.cpp
+@@ -28,7 +28,7 @@ InMemoryStorageFifo::InMemoryStorageFifo(size_t limit)
+ {
+ }
+ 
+-InMemoryStorageFifo::InMemoryStorageFifo(DummyIoService& ioService, size_t limit)
++InMemoryStorageFifo::InMemoryStorageFifo(boost::asio::io_service& ioService, size_t limit)
+   : InMemoryStorage(ioService, limit)
+ {
+ }
+diff --git a/src/ims/in-memory-storage-fifo.hpp b/src/ims/in-memory-storage-fifo.hpp
+index dd88b74..6991451 100644
+--- a/src/ims/in-memory-storage-fifo.hpp
++++ b/src/ims/in-memory-storage-fifo.hpp
+@@ -39,7 +39,7 @@ public:
+   InMemoryStorageFifo(size_t limit = 10);
+ 
+   explicit
+-  InMemoryStorageFifo(DummyIoService& ioService, size_t limit = 10);
++  InMemoryStorageFifo(boost::asio::io_service& ioService, size_t limit = 10);
+ 
+ NDN_CXX_PUBLIC_WITH_TESTS_ELSE_PROTECTED:
+   /** @brief Removes one Data packet from in-memory storage based on FIFO
+diff --git a/src/ims/in-memory-storage-lfu.cpp b/src/ims/in-memory-storage-lfu.cpp
+index 41345e1..a155f60 100644
+--- a/src/ims/in-memory-storage-lfu.cpp
++++ b/src/ims/in-memory-storage-lfu.cpp
+@@ -28,7 +28,7 @@ InMemoryStorageLfu::InMemoryStorageLfu(size_t limit)
+ {
+ }
+ 
+-InMemoryStorageLfu::InMemoryStorageLfu(DummyIoService& ioService, size_t limit)
++InMemoryStorageLfu::InMemoryStorageLfu(boost::asio::io_service& ioService, size_t limit)
+   : InMemoryStorage(ioService, limit)
+ {
+ }
+diff --git a/src/ims/in-memory-storage-lfu.hpp b/src/ims/in-memory-storage-lfu.hpp
+index ebc9711..7633cfd 100644
+--- a/src/ims/in-memory-storage-lfu.hpp
++++ b/src/ims/in-memory-storage-lfu.hpp
+@@ -43,7 +43,7 @@ public:
+   InMemoryStorageLfu(size_t limit = 10);
+ 
+   explicit
+-  InMemoryStorageLfu(DummyIoService& ioService, size_t limit = 10);
++  InMemoryStorageLfu(boost::asio::io_service& ioService, size_t limit = 10);
+ 
+ NDN_CXX_PUBLIC_WITH_TESTS_ELSE_PROTECTED:
+   /** @brief Removes one Data packet from in-memory storage based on LFU, i.e. evict the least
+diff --git a/src/ims/in-memory-storage-lru.cpp b/src/ims/in-memory-storage-lru.cpp
+index 61eff85..22c463d 100644
+--- a/src/ims/in-memory-storage-lru.cpp
++++ b/src/ims/in-memory-storage-lru.cpp
+@@ -28,7 +28,7 @@ InMemoryStorageLru::InMemoryStorageLru(size_t limit)
+ {
+ }
+ 
+-InMemoryStorageLru::InMemoryStorageLru(DummyIoService& ioService,
++InMemoryStorageLru::InMemoryStorageLru(boost::asio::io_service& ioService,
+                                        size_t limit)
+   : InMemoryStorage(ioService, limit)
+ {
+diff --git a/src/ims/in-memory-storage-lru.hpp b/src/ims/in-memory-storage-lru.hpp
+index 67ce33a..3dd9dfe 100644
+--- a/src/ims/in-memory-storage-lru.hpp
++++ b/src/ims/in-memory-storage-lru.hpp
+@@ -40,7 +40,7 @@ public:
+   explicit
+   InMemoryStorageLru(size_t limit = 10);
+ 
+-  InMemoryStorageLru(DummyIoService& ioService, size_t limit = 10);
++  InMemoryStorageLru(boost::asio::io_service& ioService, size_t limit = 10);
+ 
+ NDN_CXX_PUBLIC_WITH_TESTS_ELSE_PROTECTED:
+   /** @brief Removes one Data packet from in-memory storage based on LRU, i.e. evict the least
+diff --git a/src/ims/in-memory-storage-persistent.cpp b/src/ims/in-memory-storage-persistent.cpp
+index 716addb..ff6a3a9 100644
+--- a/src/ims/in-memory-storage-persistent.cpp
++++ b/src/ims/in-memory-storage-persistent.cpp
+@@ -28,7 +28,7 @@ InMemoryStoragePersistent::InMemoryStoragePersistent()
+ {
+ }
+ 
+-InMemoryStoragePersistent::InMemoryStoragePersistent(DummyIoService& ioService)
++InMemoryStoragePersistent::InMemoryStoragePersistent(boost::asio::io_service& ioService)
+   : InMemoryStorage(ioService)
+ {
+ }
+diff --git a/src/ims/in-memory-storage-persistent.hpp b/src/ims/in-memory-storage-persistent.hpp
+index a458a40..5920ef3 100644
+--- a/src/ims/in-memory-storage-persistent.hpp
++++ b/src/ims/in-memory-storage-persistent.hpp
+@@ -35,7 +35,7 @@ public:
+   InMemoryStoragePersistent();
+ 
+   explicit
+-  InMemoryStoragePersistent(DummyIoService& ioService);
++  InMemoryStoragePersistent(boost::asio::io_service& ioService);
+ 
+ NDN_CXX_PUBLIC_WITH_TESTS_ELSE_PROTECTED:
+   /** @brief Do nothing.
+diff --git a/src/ims/in-memory-storage.cpp b/src/ims/in-memory-storage.cpp
+index ec9876f..0dc7df7 100644
+--- a/src/ims/in-memory-storage.cpp
++++ b/src/ims/in-memory-storage.cpp
+@@ -88,7 +88,7 @@ InMemoryStorage::InMemoryStorage(size_t limit)
+   init();
+ }
+ 
+-InMemoryStorage::InMemoryStorage(DummyIoService& ioService, size_t limit)
++InMemoryStorage::InMemoryStorage(boost::asio::io_service& ioService, size_t limit)
+   : m_limit(limit)
+   , m_nPackets(0)
+ {
+diff --git a/src/ims/in-memory-storage.hpp b/src/ims/in-memory-storage.hpp
+index 9850187..9e61e7a 100644
+--- a/src/ims/in-memory-storage.hpp
++++ b/src/ims/in-memory-storage.hpp
+@@ -115,7 +115,7 @@ public:
+    *  The InMemoryStorage created through this method will handle MustBeFresh in interest processing
+    */
+   explicit
+-  InMemoryStorage(DummyIoService& ioService,
++  InMemoryStorage(boost::asio::io_service& ioService,
+                   size_t limit = std::numeric_limits<size_t>::max());
+ 
+   /** @note Please make sure to implement it to free m_freeEntries and evict
+diff --git a/src/util/scheduler.cpp b/src/util/scheduler.cpp
+index 431375a..513348f 100644
+--- a/src/util/scheduler.cpp
++++ b/src/util/scheduler.cpp
+@@ -46,7 +46,7 @@ namespace ndn {
+ namespace util {
+ namespace scheduler {
+ 
+-Scheduler::Scheduler(DummyIoService& ioService)
++Scheduler::Scheduler(boost::asio::io_service& ioService)
+   : m_scheduledEvent(m_events.end())
+ {
+ }
+diff --git a/src/util/scheduler.hpp b/src/util/scheduler.hpp
+index 6f74e9a..2d669b1 100644
+--- a/src/util/scheduler.hpp
++++ b/src/util/scheduler.hpp
+@@ -62,7 +62,7 @@ public:
+   typedef EventCallback Event;
+ 
+   explicit
+-  Scheduler(DummyIoService& ioService);
++  Scheduler(boost::asio::io_service& ioService);
+ 
+   ~Scheduler();
+ 

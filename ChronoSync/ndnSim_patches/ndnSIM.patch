@@ -1,0 +1,99 @@
+diff --git a/NFD b/NFD
+--- a/NFD
++++ b/NFD
+@@ -1 +1 @@
+-Subproject commit 0a30676920b9d3f2b2c8bc68e583befc415210cc
++Subproject commit 0a30676920b9d3f2b2c8bc68e583befc415210cc-dirty
+diff --git a/helper/ndn-fib-helper.cpp b/helper/ndn-fib-helper.cpp
+index a74ddb2..2fad4fa 100644
+--- a/helper/ndn-fib-helper.cpp
++++ b/helper/ndn-fib-helper.cpp
+@@ -174,6 +174,24 @@ FibHelper::AddRoute(const std::string& nodeName, const Name& prefix,
+   AddRoute(node, prefix, otherNode, metric);
+ }
+ 
++// Add all of the net-devices to specific prefix
++void
++FibHelper::AddRoute(Ptr<Node> node, const Name& prefix, int32_t metric)
++{
++  for (uint32_t deviceId = 0; deviceId < node->GetNDevices(); deviceId++) {
++    Ptr<NetDevice> device = node->GetDevice(deviceId);
++    Ptr<L3Protocol> ndn = node->GetObject<L3Protocol>();
++    NS_ASSERT_MSG(ndn != 0, "Ndn stack should be installed on the node");
++
++    shared_ptr<Face> face = ndn->getFaceByNetDevice(device);
++    NS_ASSERT_MSG(face != 0, "There is no face associated with the net-device");
++
++    // std::cout << "*****************face id = " << face->getId() << std::endl;
++    // std::cout << "*****************face info: " << *face << std::endl;
++    AddRoute(node, prefix, face, metric);
++  }
++}
++
+ void
+ FibHelper::RemoveRoute(Ptr<Node> node, const Name& prefix, shared_ptr<Face> face)
+ {
+diff --git a/helper/ndn-fib-helper.hpp b/helper/ndn-fib-helper.hpp
+index 381ee2d..a62de05 100644
+--- a/helper/ndn-fib-helper.hpp
++++ b/helper/ndn-fib-helper.hpp
+@@ -101,6 +101,16 @@ public:
+            int32_t metric);
+ 
+   /**
++   * @brief Add forwarding entry to FIB (add all of the net devices)
++   *
++   * \param nodeName Node name (refer to ns3::Names)
++   * \param prefix Routing prefix
++   * \param metric Routing metric
++   */
++  static void
++  AddRoute(Ptr<Node> node, const Name& prefix, int32_t metric);
++  
++  /**
+    * \brief remove forwarding entry in FIB
+    *
+    * \param node Node
+diff --git a/helper/ndn-stack-helper.cpp b/helper/ndn-stack-helper.cpp
+index 82dab49..c95b6db 100644
+--- a/helper/ndn-stack-helper.cpp
++++ b/helper/ndn-stack-helper.cpp
+@@ -72,6 +72,18 @@ StackHelper::~StackHelper()
+ {
+ }
+ 
++void
++StackHelper::setLossRate(double lossRate, Ptr<Node> node)
++{
++
++  Ptr<L3Protocol> l3Protocol = node->GetObject<L3Protocol>();
++  NS_ASSERT(l3Protocol != nullptr);
++  NS_ASSERT(l3Protocol->getForwarder() != nullptr);
++
++  nfd::Forwarder& forwarder = *l3Protocol->getForwarder();
++  forwarder.setLossRate(lossRate);
++}
++
+ KeyChain&
+ StackHelper::getKeyChain()
+ {
+diff --git a/helper/ndn-stack-helper.hpp b/helper/ndn-stack-helper.hpp
+index bae814f..5d68b1a 100644
+--- a/helper/ndn-stack-helper.hpp
++++ b/helper/ndn-stack-helper.hpp
+@@ -65,6 +65,9 @@ public:
+    */
+   virtual ~StackHelper();
+ 
++  static void
++  setLossRate(double lossRate, Ptr<Node> node);
++
+   /**
+    * @brief Set parameters of NdnL3Protocol
+    */
+diff --git a/ndn-cxx b/ndn-cxx
+--- a/ndn-cxx
++++ b/ndn-cxx
+@@ -1 +1 @@
+-Subproject commit c37bf1633828ef6b69646a4989a9cef855e08248
++Subproject commit c37bf1633828ef6b69646a4989a9cef855e08248-dirty
