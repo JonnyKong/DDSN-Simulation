@@ -1,0 +1,4 @@
+.lock-waf_darwin_build
+.waf-1.9.5-*
+.waf-tools/*.pyc
+build/
