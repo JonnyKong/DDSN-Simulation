@@ -1,5 +1,5 @@
 # DDSN-Simulation
-Simulation code for paper submission "Distributed Data Synchronization in Disruptive Data-Centric Networks".
+Simulation code for paper submission "*Distributed Data Synchronization in Disruptive Networks*".
 
 ### Prerequisites
 
@@ -12,3 +12,4 @@ Separate version of NS-3 and specified version of ndnSIM needs to be installed f
 * [DDSN](DDSN/README.md)
 * [ChronoSync](ChronoSync/README.md)
 * [PSync](PSync/README.md)
+
