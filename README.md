@@ -1,5 +1,8 @@
-# DDSN-Simulation
-Simulation code for paper submission "*Distributed Data Synchronization in Disruptive Networks*".
+# Distributed Dataset Synchronization in Disruptive Networks (MASS 2019)
+
+*Tianxiang Li, Zhaoning Kong, Spyridon Mastorakis, Lixia Zhang*
+
+[[Paper]](https://www.researchgate.net/profile/Spyridon_Mastorakis/publication/337032871_Distributed_Dataset_Synchronization_in_Disruptive_Networks/links/5dc2dceca6fdcc21280bae79/Distributed-Dataset-Synchronization-in-Disruptive-Networks.pdf)
 
 ### Prerequisites
 
